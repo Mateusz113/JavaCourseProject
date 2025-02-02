@@ -1,6 +1,7 @@
 package com.mateusz113.shop.app;
 
 import com.mateusz113.shop.app.menu_navigation.AuthOption;
+import com.mateusz113.shop.app.menu_navigation.MainOption;
 import com.mateusz113.shop.auth.AuthManager;
 import com.mateusz113.shop.auth.LoginDetails;
 import com.mateusz113.shop.auth.RegisterDetails;
@@ -39,7 +40,7 @@ public class ShopControl {
 
     public void authLoop() {
         AuthOption option;
-        printAuthOptions();
+        printMenuOptions(AuthOption.values());
         option = getAuthOption();
         switch (option) {
             case EXIT -> exit();
@@ -48,17 +49,12 @@ public class ShopControl {
         }
     }
 
-    public void mainLoop() {
-        printLine(String.format("Witaj %s!", currentUser.firstName()));
-        exit();
-    }
-
     public void login() {
         LoginDetails details = consoleReader.readLoginDetails();
         printLine(details.toString());
         try {
             currentUser = authManager.loginUser(details, fileReader);
-            printLine("Pomyślnie zalogowano.");
+            printLine("Pomyślnie zalogowano.\n");
             mainLoop();
         } catch (NoSuchUserException e) {
             printLine(e.getMessage());
@@ -73,7 +69,7 @@ public class ShopControl {
         RegisterDetails details = consoleReader.readRegisterDetails();
         try {
             currentUser = authManager.registerUser(details, writer, fileReader);
-            printLine("Pomyślnie zarejestrowano.");
+            printLine("Pomyślnie zarejestrowano.\n");
             mainLoop();
         } catch (UserAlreadyExistsException e) {
             printLine(e.getMessage());
@@ -84,8 +80,40 @@ public class ShopControl {
         }
     }
 
+    public void mainLoop() {
+        printLine(String.format("Witaj %s!", currentUser.firstName()));
+        MainOption option;
+        do {
+            printMenuOptions(MainOption.values());
+            option = getMainOption();
+            switch (option) {
+                case EXIT -> exit();
+                case SHOP -> shop();
+                case MANAGE_PRODUCTS -> manageProducts();
+                case CART -> cart();
+                case PREVIOUS_ORDERS -> previousOrders();
+            }
+        } while (option != MainOption.EXIT);
+    }
+
     private void exit() {
         printLine("Zapraszamy ponownie!");
+    }
+
+    private void shop() {
+        printLine("Zakupy");
+    }
+
+    private void manageProducts() {
+        printLine("Zarządzenie produktami");
+    }
+
+    private void cart() {
+        printLine("Wózek");
+    }
+
+    private void previousOrders() {
+        printLine("Poprzednie zamówienia");
     }
 
     private AuthOption getAuthOption() {
@@ -95,6 +123,21 @@ public class ShopControl {
             try {
                 int value = consoleReader.readIntValue();
                 option = AuthOption.getOptionFromValue(value);
+                optionIsValid = true;
+            } catch (NoSuchOptionException e) {
+                printLine(e.getMessage());
+            }
+        }
+        return option;
+    }
+
+    private MainOption getMainOption() {
+        boolean optionIsValid = false;
+        MainOption option = null;
+        while (!optionIsValid) {
+            try {
+                int value = consoleReader.readIntValue();
+                option = MainOption.getOptionFromValue(value);
                 optionIsValid = true;
             } catch (NoSuchOptionException e) {
                 printLine(e.getMessage());
