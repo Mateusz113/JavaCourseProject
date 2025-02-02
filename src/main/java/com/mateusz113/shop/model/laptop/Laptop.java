@@ -1,0 +1,46 @@
+package com.mateusz113.shop.model.laptop;
+
+import com.mateusz113.shop.model.Product;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Laptop extends Product {
+    private final String processor;
+    private final String graphicsCard;
+    private int ramMemory;
+    private int monitorRefreshRate;
+    private List<LaptopAccessory> accessories;
+
+    public Laptop(String id, String name, BigDecimal price, int quantity, String processor, String graphicsCard) {
+        super(id, name, price, quantity);
+        this.processor = processor;
+        this.graphicsCard = graphicsCard;
+        this.accessories = new ArrayList<>();
+    }
+
+    public int getRamMemory() {
+        return ramMemory;
+    }
+
+    public void setRamMemory(int ramMemory) {
+        this.ramMemory = ramMemory;
+    }
+
+    public int getMonitorRefreshRate() {
+        return monitorRefreshRate;
+    }
+
+    public void setMonitorRefreshRate(int monitorRefreshRate) {
+        this.monitorRefreshRate = monitorRefreshRate;
+    }
+
+    public List<LaptopAccessory> getAccessories() {
+        return accessories;
+    }
+
+    public void addAccessory(LaptopAccessory la) {
+        accessories.add(la);
+    }
+}
