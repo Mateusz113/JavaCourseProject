@@ -29,13 +29,13 @@ public class ShopFileWriter extends FileHandler {
     }
 
     private void saveUserLoginInfo(RegisterDetails registerDetails, String id) throws IOException {
-        String userLoginInfo = String.format("%s;%s;%s", registerDetails.email(), registerDetails.password(), id);
+        String userLoginInfo = String.format("%s;%s;%s%n", registerDetails.email(), registerDetails.password(), id);
         writeStringToFile(userLoginInfo, getUserLoginInfoPath());
     }
 
     private void saveUserDetails(RegisterDetails registerDetails, String id) throws IOException {
         String userDetails = String
-                .format("%s;%s;%s;%s", id, registerDetails.firstName(), registerDetails.lastName(), registerDetails.email());
+                .format("%s;%s;%s;%s%n", id, registerDetails.firstName(), registerDetails.lastName(), registerDetails.email());
         writeStringToFile(userDetails, getUserDetailsPath());
     }
 
