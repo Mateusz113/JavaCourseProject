@@ -11,9 +11,9 @@ public class ConsolePrinter {
         printLine("***** WITAMY W APLIKACJI ELECTRONICS SHOP *****");
     }
 
-    public static void printAuthOptions() {
-        for (AuthOption authOption : AuthOption.values()) {
-            printLine(authOption.toString());
+    public static <T> void printMenuOptions(T[] options) {
+        for (T option : options) {
+            printLine(option.toString());
         }
     }
 }
