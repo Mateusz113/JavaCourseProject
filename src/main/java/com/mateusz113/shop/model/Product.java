@@ -34,4 +34,13 @@ public class Product {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public String toString() {
+        return String.format("""
+                Nazwa: %s
+                Cena: %.2f zł
+                Dostępna ilość: %d
+                """, name, price, quantity);
+    }
 }

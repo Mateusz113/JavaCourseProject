@@ -43,4 +43,17 @@ public class Laptop extends Product {
     public void addAccessory(LaptopAccessory la) {
         accessories.add(la);
     }
+
+    @Override
+    public String toString() {
+        return String.format("""
+                Nazwa: %s
+                Cena: %.2f zł
+                Procesor: %s
+                Karta graficzna: %s
+                Pamięć ram: %d GB
+                Częstotliwość odświeżania monitora: %d Hz
+                Dostępna ilość: %d
+                """,getName(), getPrice(), processor, graphicsCard, ramMemory, monitorRefreshRate, getQuantity());
+    }
 }

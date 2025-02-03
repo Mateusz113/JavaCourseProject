@@ -41,4 +41,15 @@ public class Phone extends Product {
     public void addAccessory(PhoneAccessory pa) {
         accessories.add(pa);
     }
+
+    @Override
+    public String toString() {
+        return String.format("""
+                Nazwa: %s
+                Cena: %.2f zł
+                Kolor: %s
+                Pojemność baterii: %d
+                Dostępna ilość: %d
+                """, getName(), getPrice(), phoneColor, batterySize, getQuantity());
+    }
 }
