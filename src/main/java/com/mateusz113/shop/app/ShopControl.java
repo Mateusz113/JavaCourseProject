@@ -132,14 +132,33 @@ public class ShopControl {
         printProducts(shopProducts);
         printLine("Podaj numer produktu który chcesz kupić, lub wpisz 0 by cofnąć do głównego menu.");
         int input = consoleReader.readIntValue(0, shopProducts.size());
-        if (input == 0) mainLoop();
+        if (input == 0) return;
         Product chosenProduct = shopProducts.get(input - 1);
         consoleReader.configureProduct(chosenProduct);
-        mainLoop();
     }
 
     private void manageProducts() {
-        printLine("Zarządzenie produktami");
+        printProductsManagementMenu();
+        int input = consoleReader.readIntValue(0, 2);
+        if (input == 0) return;
+        switch (input) {
+            case 1 -> shopProducts.add(consoleReader.readProductFromKeyboard());
+            case 2 -> updateProductQuantity();
+        }
+    }
+
+    private void updateProductQuantity() {
+        printProducts(shopProducts);
+        printLine("Podaj numer produktu którego ilość chcesz zmienić:");
+        int input = consoleReader.readIntValue(1, shopProducts.size());
+        Product chosenProduct = shopProducts.get(input - 1);
+        printLine(String.format("Wprowadź nową ilość produktu (poprzednio wynosiła %d)", chosenProduct.getQuantity()));
+        input = consoleReader.readIntValue(0, chosenProduct.getQuantity());
+        chosenProduct.setQuantity(input);
+        if (chosenProduct.getQuantity() == 0) {
+            shopProducts.remove(chosenProduct);
+        }
+        printLine("Pomyślnie zaktualizowano ilość produktu.");
     }
 
     private void cart() {
