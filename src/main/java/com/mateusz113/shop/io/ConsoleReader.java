@@ -4,8 +4,14 @@ import com.mateusz113.shop.auth.LoginDetails;
 import com.mateusz113.shop.auth.LoginDetails.LoginDetailsBuilder;
 import com.mateusz113.shop.auth.RegisterDetails;
 import com.mateusz113.shop.auth.RegisterDetails.RegisterDetailsBuilder;
+import com.mateusz113.shop.model.Product;
+import com.mateusz113.shop.model.laptop.Laptop;
+import com.mateusz113.shop.model.laptop.LaptopAccessory;
+import com.mateusz113.shop.model.phone.Phone;
+import com.mateusz113.shop.model.phone.PhoneAccessory;
 import com.mateusz113.shop.validation.InputValidator;
 
+import java.math.BigDecimal;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.function.Consumer;
@@ -41,6 +47,141 @@ public class ConsoleReader {
         return builder.build();
     }
 
+    public void configureProduct(Product chosenProduct) {
+        if (chosenProduct instanceof Phone) configurePhone((Phone) chosenProduct);
+        if (chosenProduct instanceof Laptop) configureLaptop((Laptop) chosenProduct);
+        printLine("Ile sztuk produktu chciałbyś kupić?");
+        int input = readIntValue(1, chosenProduct.getQuantity());
+        chosenProduct.setQuantity(input);
+    }
+
+    private void configurePhone(Phone phone) {
+        printLine("Jaki chcesz kolor telefonu?");
+        printLine("""
+                1. Czarny
+                2. Niebieski (+20 zł)
+                3. Czerwony (+30 zł)
+                4. Złoty (+100 zł)
+                """);
+        int input = readIntValue(1, 4);
+        switch (input) {
+            case 1 -> {
+                phone.setPhoneColor("Czarny");
+            }
+            case 2 -> {
+                phone.setPhoneColor("Niebieski");
+                phone.setPrice(phone.getPrice().add(BigDecimal.valueOf(20)));
+            }
+            case 3 -> {
+                phone.setPhoneColor("Czerwony");
+                phone.setPrice(phone.getPrice().add(BigDecimal.valueOf(30)));
+            }
+            case 4 -> {
+                phone.setPhoneColor("Złoty");
+                phone.setPrice(phone.getPrice().add(BigDecimal.valueOf(100)));
+            }
+        }
+        printLine("Jaki chcesz rozmiar baterii?");
+        printLine("""
+                1. 3000 mAh
+                2. 4000 mAh (+100 zł)
+                3. 5000 mAh (+200 zł)
+                4. 6000 mAh (+300 zł)
+                """);
+        input = readIntValue(1, 4);
+        switch (input) {
+            case 1 -> {
+                phone.setBatterySize(3000);
+            }
+            case 2 -> {
+                phone.setBatterySize(4000);
+                phone.setPrice(phone.getPrice().add(BigDecimal.valueOf(100)));
+            }
+            case 3 -> {
+                phone.setBatterySize(5000);
+                phone.setPrice(phone.getPrice().add(BigDecimal.valueOf(200)));
+            }
+            case 4 -> {
+                phone.setBatterySize(6000);
+                phone.setPrice(phone.getPrice().add(BigDecimal.valueOf(300)));
+            }
+        }
+        for (PhoneAccessory accessory : PhoneAccessory.values()) {
+            printLine(String.format("Czy może chciałbyś też: %s", accessory.getPrintName()));
+            printLine(String.format("""
+                    1. Tak (+%.2f zł)
+                    2. Nie
+                    """, accessory.getAdditionalPrice()
+            ));
+            input = readIntValue(1, 2);
+            if (input == 1) phone.addAccessory(accessory);
+        }
+    }
+
+    private void configureLaptop(Laptop laptop) {
+        printLine("Ile chcesz pamięci ram?");
+        printLine("""
+                1. 4 GB
+                2. 8 GB (+200 zł)
+                3. 16 GB (+500 zł)
+                4. 32 GB (+1000 zł)
+                """);
+        int input = readIntValue(1, 4);
+        switch (input) {
+            case 1 -> {
+                laptop.setRamMemory(4);
+            }
+            case 2 -> {
+                laptop.setRamMemory(8);
+                laptop.setPrice(laptop.getPrice().add(BigDecimal.valueOf(200)));
+            }
+            case 3 -> {
+                laptop.setRamMemory(16);
+                laptop.setPrice(laptop.getPrice().add(BigDecimal.valueOf(500)));
+            }
+            case 4 -> {
+                laptop.setRamMemory(32);
+                laptop.setPrice(laptop.getPrice().add(BigDecimal.valueOf(1000)));
+            }
+        }
+        printLine("Jakie chcesz odświeżanie procesora?");
+        printLine("""
+                1. 60 Hz
+                2. 120 Hz (+200 zł)
+                3. 240 Hz (+400 zł)
+                4. 320 Hz (+700 zł)
+                """);
+        input = readIntValue(1, 4);
+        switch (input) {
+            case 1 -> {
+                laptop.setMonitorRefreshRate(60);
+            }
+            case 2 -> {
+                laptop.setMonitorRefreshRate(120);
+                laptop.setPrice(laptop.getPrice().add(BigDecimal.valueOf(200)));
+            }
+            case 3 -> {
+                laptop.setMonitorRefreshRate(240);
+                laptop.setPrice(laptop.getPrice().add(BigDecimal.valueOf(400)));
+            }
+            case 4 -> {
+                laptop.setMonitorRefreshRate(320);
+                laptop.setPrice(laptop.getPrice().add(BigDecimal.valueOf(700)));
+            }
+        }
+
+        for (LaptopAccessory accessory : LaptopAccessory.values()) {
+            printLine(String.format("Czy może chciałbyś też: %s", accessory.getPrintName()));
+            printLine(String.format("""
+                    1. Tak (+%.2f zł)
+                    2. Nie
+                    """, accessory.getAdditionalPrice()
+            ));
+            input = readIntValue(1, 2);
+            if (input == 1) laptop.addAccessory(accessory);
+        }
+    }
+
     public int readIntValue() {
         int value = -1;
         boolean isInputValid = false;
@@ -55,6 +196,27 @@ public class ConsoleReader {
             }
         }
         return value;
+    }
+
+    //Function includes from and to values when boundary checking
+    public int readIntValue(int from, int to) {
+        int input = Integer.MIN_VALUE;
+        boolean inputIsValid = false;
+        while (!inputIsValid) {
+            try {
+                input = sc.nextInt();
+                if (input < from || input > to) {
+                    printLine(String.format("Wprowadzona liczba musi się mieścić w zakrecie od %d do %d!", from, to));
+                } else {
+                    inputIsValid = true;
+                }
+            } catch (InputMismatchException e) {
+                printLine("Wprowadzony tekst nie jest liczbą! Spróbuj ponownie.");
+            } finally {
+                sc.nextLine();
+            }
+        }
+        return input;
     }
 
     private String readStringValueWithValidator(Consumer<String> validator) {

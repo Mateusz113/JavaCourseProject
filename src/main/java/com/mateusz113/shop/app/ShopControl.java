@@ -5,36 +5,60 @@ import com.mateusz113.shop.app.menu_navigation.MainOption;
 import com.mateusz113.shop.auth.AuthManager;
 import com.mateusz113.shop.auth.LoginDetails;
 import com.mateusz113.shop.auth.RegisterDetails;
+import com.mateusz113.shop.converter.ProductConverter;
+import com.mateusz113.shop.exception.IllegalFormatException;
 import com.mateusz113.shop.exception.NoSuchOptionException;
 import com.mateusz113.shop.exception.NoSuchUserException;
 import com.mateusz113.shop.exception.UserAlreadyExistsException;
 import com.mateusz113.shop.io.ConsoleReader;
-import com.mateusz113.shop.io.file.ShopFileReader;
-import com.mateusz113.shop.io.file.ShopFileWriter;
+import com.mateusz113.shop.io.file.product.ProductFileReader;
+import com.mateusz113.shop.io.file.product.ProductFileWriter;
+import com.mateusz113.shop.io.file.user.UserFileReader;
+import com.mateusz113.shop.io.file.user.UserFileWriter;
+import com.mateusz113.shop.model.Product;
 import com.mateusz113.shop.model.User;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static com.mateusz113.shop.io.ConsolePrinter.*;
 
 public class ShopControl {
     private final String USER_LOGIN_INFO_FILE_PATH = "src/main/resources/data/userLoginInfo.txt";
     private final String USER_DETAILS_FILE_PATH = "src/main/resources/data/userData.txt";
+    private final String PRODUCT_DETAILS_FILE_PATH = "src/main/resources/data/productData.txt";
     private final AuthManager authManager;
+    private final ProductConverter productConverter;
     private final ConsoleReader consoleReader;
-    private final ShopFileReader fileReader;
-    private final ShopFileWriter writer;
+    private final UserFileReader userFileReader;
+    private final UserFileWriter userFileWriter;
+    private final ProductFileReader productFileReader;
+    private final ProductFileWriter productFileWriter;
     private User currentUser;
+    private List<Product> shopProducts;
 
     public ShopControl() {
         this.consoleReader = new ConsoleReader();
-        this.fileReader = new ShopFileReader(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH);
-        this.writer = new ShopFileWriter(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH);
+        this.userFileReader = new UserFileReader(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH);
+        this.userFileWriter = new UserFileWriter(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH);
+        this.productFileReader = new ProductFileReader(PRODUCT_DETAILS_FILE_PATH);
+        this.productFileWriter = new ProductFileWriter(PRODUCT_DETAILS_FILE_PATH);
         this.authManager = new AuthManager();
+        this.productConverter = new ProductConverter();
     }
 
     public void start() {
         printGreeting();
+        CompletableFuture.runAsync(() -> {
+            try {
+                shopProducts = productConverter.constructProductListFromDetails(productFileReader.getProductsFromFile());
+                Collections.shuffle(shopProducts);
+            } catch (IOException | IllegalFormatException e) {
+                printLine("Aplikacja napotkała problem: " + e.getMessage());
+            }
+        });
         authLoop();
     }
 
@@ -51,9 +75,8 @@ public class ShopControl {
 
     public void login() {
         LoginDetails details = consoleReader.readLoginDetails();
-        printLine(details.toString());
         try {
-            currentUser = authManager.loginUser(details, fileReader);
+            currentUser = authManager.loginUser(details, userFileReader);
             printLine("Pomyślnie zalogowano.\n");
             mainLoop();
         } catch (NoSuchUserException e) {
@@ -68,7 +91,7 @@ public class ShopControl {
     public void register() {
         RegisterDetails details = consoleReader.readRegisterDetails();
         try {
-            currentUser = authManager.registerUser(details, writer, fileReader);
+            currentUser = authManager.registerUser(details, userFileWriter, userFileReader);
             printLine("Pomyślnie zarejestrowano.\n");
             mainLoop();
         } catch (UserAlreadyExistsException e) {
@@ -97,11 +120,22 @@ public class ShopControl {
     }
 
     private void exit() {
+        try {
+            productFileWriter.saveShopProductData(productConverter.constructDetailsListFromProducts(shopProducts));
+        } catch (IOException e) {
+            printLine(e.getMessage());
+        }
         printLine("Zapraszamy ponownie!");
     }
 
     private void shop() {
-        printLine("Zakupy");
+        printProducts(shopProducts);
+        printLine("Podaj numer produktu który chcesz kupić, lub wpisz 0 by cofnąć do głównego menu.");
+        int input = consoleReader.readIntValue(0, shopProducts.size());
+        if (input == 0) mainLoop();
+        Product chosenProduct = shopProducts.get(input - 1);
+        consoleReader.configureProduct(chosenProduct);
+        mainLoop();
     }
 
     private void manageProducts() {

@@ -1,4 +1,4 @@
-package com.mateusz113.shop.io.file;
+package com.mateusz113.shop.io.file.user;
 
 import com.mateusz113.shop.auth.LoginDetails;
 import com.mateusz113.shop.exception.NoSuchUserException;
@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class ShopFileReader extends FileHandler {
-    public ShopFileReader(String userLoginInfoPath, String userDetailsPath) {
+public class UserFileReader extends UserFileHandler {
+    public UserFileReader(String userLoginInfoPath, String userDetailsPath) {
         super(userLoginInfoPath, userDetailsPath);
     }
 

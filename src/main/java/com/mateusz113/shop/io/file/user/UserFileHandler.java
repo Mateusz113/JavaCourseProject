@@ -1,10 +1,10 @@
-package com.mateusz113.shop.io.file;
+package com.mateusz113.shop.io.file.user;
 
-public abstract class FileHandler {
+public abstract class UserFileHandler {
     private final String userLoginInfoPath;
     private final String userDetailsPath;
 
-    public FileHandler(String userLoginInfoPath, String userDetailsPath) {
+    public UserFileHandler(String userLoginInfoPath, String userDetailsPath) {
         this.userLoginInfoPath = userLoginInfoPath;
         this.userDetailsPath = userDetailsPath;
     }

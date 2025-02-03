@@ -27,11 +27,24 @@ public class Product {
         return price;
     }
 
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
     public int getQuantity() {
         return quantity;
     }
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("""
+                Nazwa: %s
+                Cena: %.2f zł
+                Ilość: %d
+                """, name, price, quantity);
     }
 }
