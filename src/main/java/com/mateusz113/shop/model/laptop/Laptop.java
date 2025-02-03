@@ -5,6 +5,7 @@ import com.mateusz113.shop.model.Product;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Laptop extends Product {
     private final String processor;
@@ -18,6 +19,14 @@ public class Laptop extends Product {
         this.processor = processor;
         this.graphicsCard = graphicsCard;
         this.accessories = new ArrayList<>();
+    }
+
+    public String getProcessor() {
+        return processor;
+    }
+
+    public String getGraphicsCard() {
+        return graphicsCard;
     }
 
     public int getRamMemory() {
@@ -53,7 +62,12 @@ public class Laptop extends Product {
                 Karta graficzna: %s
                 Pamięć ram: %d GB
                 Częstotliwość odświeżania monitora: %d Hz
-                Dostępna ilość: %d
-                """,getName(), getPrice(), processor, graphicsCard, ramMemory, monitorRefreshRate, getQuantity());
+                Akcesoria: %s
+                Ilość: %d
+                """, getName(), getPrice(), processor, graphicsCard, ramMemory, monitorRefreshRate, getAccessoriesAsString(), getQuantity());
+    }
+
+    private String getAccessoriesAsString() {
+        return accessories.stream().map(LaptopAccessory::getPrintName).collect(Collectors.joining(", "));
     }
 }
