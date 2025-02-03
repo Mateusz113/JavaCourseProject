@@ -5,13 +5,12 @@ import com.mateusz113.shop.auth.RegisterDetails;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.UUID;
 
 public class ShopFileWriter extends FileHandler {
     private boolean append;
 
-    public ShopFileWriter(String userLoginInfoPath, String userDetailsPath) {
-        super(userLoginInfoPath, userDetailsPath);
+    public ShopFileWriter(String userLoginInfoPath, String userDetailsPath, String productDetailsPath) {
+        super(userLoginInfoPath, userDetailsPath, productDetailsPath);
         append = true;
     }
 

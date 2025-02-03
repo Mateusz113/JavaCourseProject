@@ -12,8 +12,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class ShopFileReader extends FileHandler {
-    public ShopFileReader(String userLoginInfoPath, String userDetailsPath) {
-        super(userLoginInfoPath, userDetailsPath);
+    public ShopFileReader(String userLoginInfoPath, String userDetailsPath, String productDetailsPath) {
+        super(userLoginInfoPath, userDetailsPath, productDetailsPath);
     }
 
     public List<LoginDetails> getUsersLoginDetails() throws IOException {
