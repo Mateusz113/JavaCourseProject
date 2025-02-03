@@ -13,6 +13,13 @@ public class ConsolePrinter {
         printLine("***** WITAMY W APLIKACJI ELECTRONICS SHOP *****");
     }
 
+    public static void printProductsManagementMenu(){
+        printLine("Co chcesz zrobić?");
+        printLine("0. Wróć do głównego menu");
+        printLine("1. Dodaj produkt");
+        printLine("2. Zmień ilość produktu");
+    }
+
     public static void printProducts(List<Product> products) {
         int i = 1;
         for (Product p : products) {

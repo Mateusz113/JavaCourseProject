@@ -13,7 +13,9 @@ import com.mateusz113.shop.validation.InputValidator;
 
 import java.math.BigDecimal;
 import java.util.InputMismatchException;
+import java.util.Locale;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static com.mateusz113.shop.io.ConsolePrinter.printLine;
@@ -23,6 +25,7 @@ public class ConsoleReader {
 
     public ConsoleReader() {
         sc = new Scanner(System.in);
+        sc.useLocale(Locale.US);
     }
 
     public RegisterDetails readRegisterDetails() {
@@ -182,6 +185,36 @@ public class ConsoleReader {
         }
     }
 
+    public Product readProductFromKeyboard() {
+        printLine("""
+                Co chcesz dodać?
+                1.Laptop
+                2.Telefon
+                3.Inny produkt""");
+        int type = readIntValue(1, 3);
+        printLine("Podaj nazwę produktu:");
+        String name = sc.nextLine();
+        printLine("Podaj cenę produktu:");
+        BigDecimal price = readBigDecimalValue();
+        printLine("Podaj ilość sztuk produktu:");
+        int quantity = readIntValue();
+        Product product = null;
+        switch (type) {
+            case 1 -> product = readLaptopFromKeyboard(name, price, quantity);
+            case 2 -> product = new Phone(UUID.randomUUID().toString(), name, price, quantity);
+            case 3 -> product = new Product(UUID.randomUUID().toString(), name, price, quantity);
+        }
+        return product;
+    }
+
+    private Laptop readLaptopFromKeyboard(String name, BigDecimal price, int quantity) {
+        printLine("Podaj nazwę procesora:");
+        String processor = sc.nextLine();
+        printLine("Podaj nazwę karty graficznej:");
+        String graphicsCard = sc.nextLine();
+        return new Laptop(UUID.randomUUID().toString(), name, price, quantity, processor, graphicsCard);
+    }
+
     public int readIntValue() {
         int value = -1;
         boolean isInputValid = false;
@@ -212,6 +245,22 @@ public class ConsoleReader {
                 }
             } catch (InputMismatchException e) {
                 printLine("Wprowadzony tekst nie jest liczbą! Spróbuj ponownie.");
+            } finally {
+                sc.nextLine();
+            }
+        }
+        return input;
+    }
+
+    public BigDecimal readBigDecimalValue() {
+        BigDecimal input = null;
+        boolean inputIsValid = false;
+        while (!inputIsValid) {
+            try {
+                input = sc.nextBigDecimal();
+                inputIsValid = true;
+            } catch (InputMismatchException e) {
+                printLine("Wprowadzony tekst nie jest liczbą, lub użyto nieprawidłowego znaku rozdzielającego części dziesiętne! (Używaj kropki)");
             } finally {
                 sc.nextLine();
             }
