@@ -27,6 +27,10 @@ public class Product {
         return price;
     }
 
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
     public int getQuantity() {
         return quantity;
     }
@@ -40,7 +44,7 @@ public class Product {
         return String.format("""
                 Nazwa: %s
                 Cena: %.2f zł
-                Dostępna ilość: %d
+                Ilość: %d
                 """, name, price, quantity);
     }
 }
