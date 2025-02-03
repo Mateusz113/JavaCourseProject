@@ -5,6 +5,7 @@ import com.mateusz113.shop.model.Product;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Phone extends Product {
     private String phoneColor;
@@ -48,8 +49,13 @@ public class Phone extends Product {
                 Nazwa: %s
                 Cena: %.2f zł
                 Kolor: %s
-                Pojemność baterii: %d
-                Dostępna ilość: %d
-                """, getName(), getPrice(), phoneColor, batterySize, getQuantity());
+                Pojemność baterii: %d mAh
+                Akcesoria: %s
+                Ilość: %d
+                """, getName(), getPrice(), phoneColor, batterySize, getAccessoriesAsString(), getQuantity());
+    }
+
+    private String getAccessoriesAsString() {
+        return accessories.stream().map(PhoneAccessory::getPrintName).collect(Collectors.joining(", "));
     }
 }
