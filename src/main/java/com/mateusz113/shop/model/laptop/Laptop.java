@@ -18,6 +18,8 @@ public class Laptop extends Product {
         super(id, name, price, quantity);
         this.processor = processor;
         this.graphicsCard = graphicsCard;
+        this.ramMemory = 4;
+        this.monitorRefreshRate = 60;
         this.accessories = new ArrayList<>();
     }
 
