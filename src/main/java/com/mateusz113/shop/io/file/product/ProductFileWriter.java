@@ -19,8 +19,6 @@ public class ProductFileWriter extends ProductFileHandler implements FileWriterI
     }
 
     public void saveShopProductData(List<String> detailsList) throws IOException {
-        for (String details : detailsList) {
-            writeStringToFile(details, getProductDetailsPath(), append);
-        }
+        writeStringListToFile(detailsList, getProductDetailsPath(), append);
     }
 }
