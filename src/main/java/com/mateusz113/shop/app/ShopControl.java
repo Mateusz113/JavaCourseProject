@@ -20,6 +20,7 @@ import static com.mateusz113.shop.io.ConsolePrinter.*;
 public class ShopControl {
     private final String USER_LOGIN_INFO_FILE_PATH = "src/main/resources/data/userLoginInfo.txt";
     private final String USER_DETAILS_FILE_PATH = "src/main/resources/data/userData.txt";
+    private final String PRODUCT_DETAILS_FILE_PATH = "src/main/resources/data/productData.txt";
     private final AuthManager authManager;
     private final ConsoleReader consoleReader;
     private final ShopFileReader fileReader;
@@ -28,8 +29,8 @@ public class ShopControl {
 
     public ShopControl() {
         this.consoleReader = new ConsoleReader();
-        this.fileReader = new ShopFileReader(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH);
-        this.writer = new ShopFileWriter(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH);
+        this.fileReader = new ShopFileReader(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH, PRODUCT_DETAILS_FILE_PATH);
+        this.writer = new ShopFileWriter(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH, PRODUCT_DETAILS_FILE_PATH);
         this.authManager = new AuthManager();
     }
 
