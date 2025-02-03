@@ -67,4 +67,16 @@ public class ShopFileReader extends FileHandler {
             throw new NoSuchUserException("Użytkownik o podanym id nie istnieje!");
         }
     }
+
+    public List<String> getProductsFromFile() throws IOException {
+        try (
+                BufferedReader reader = new BufferedReader(new FileReader(getProductDetailsPath()))
+        ) {
+            return reader
+                    .lines()
+                    .filter(line -> !line.isBlank())
+                    .map(String::trim)
+                    .toList();
+        }
+    }
 }
