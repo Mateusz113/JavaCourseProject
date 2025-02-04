@@ -50,12 +50,39 @@ public class ConsoleReader {
         return builder.build();
     }
 
-    public void configureProduct(Product chosenProduct) {
-        if (chosenProduct instanceof Phone) configurePhone((Phone) chosenProduct);
-        if (chosenProduct instanceof Laptop) configureLaptop((Laptop) chosenProduct);
+    public Product configureProduct(Product chosenProduct) {
+        Product configuredProduct = null;
+        if (chosenProduct instanceof Phone) {
+            configuredProduct = new Phone(
+                    chosenProduct.getId(),
+                    chosenProduct.getName(),
+                    chosenProduct.getPrice(),
+                    chosenProduct.getQuantity()
+            );
+            configurePhone((Phone) configuredProduct);
+        }
+        if (chosenProduct instanceof Laptop laptop) {
+            configuredProduct = new Laptop(
+                    laptop.getId(),
+                    laptop.getName(),
+                    laptop.getPrice(),
+                    laptop.getQuantity(),
+                    laptop.getProcessor(),
+                    laptop.getGraphicsCard());
+            configureLaptop((Laptop) chosenProduct);
+        }
         printLine("Ile sztuk produktu chciałbyś kupić?");
         int input = readIntValue(1, chosenProduct.getQuantity());
-        chosenProduct.setQuantity(input);
+        if (configuredProduct == null) {
+            configuredProduct = new Product(
+                    chosenProduct.getId(),
+                    chosenProduct.getName(),
+                    chosenProduct.getPrice(),
+                    0
+            );
+        }
+        configuredProduct.setQuantity(input);
+        return configuredProduct;
     }
 
     private void configurePhone(Phone phone) {
