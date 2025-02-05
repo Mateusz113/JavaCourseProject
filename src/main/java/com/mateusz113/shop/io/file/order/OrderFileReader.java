@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class OrderFileReader extends OrderFileHandler {
     public List<List<String>> readOldOrders(String userId) throws IOException {
         List<List<String>> oldOrders = new ArrayList<>();
-        Path folderPath = Paths.get(String.format("%s/%s", getOrderDetailsFolder(), userId));
+        Path folderPath = Paths.get(getOrderDetailsFolder());
         try (
                 Stream<Path> filePaths = Files.list(folderPath);
         ) {
