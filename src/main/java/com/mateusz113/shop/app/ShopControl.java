@@ -299,6 +299,21 @@ public class ShopControl {
     private void previousOrders() {
         List<Order> orders = orderManager.getAllOrders();
         printPreviousOrders(orders);
+        int input = consoleReader.readIntValue(0, orders.size());
+        if (input != 0) {
+            Order chosenOrder = orders.get(input - 1);
+            try {
+                orderFileWriter.createInvoice(chosenOrder, currentUser);
+            } catch (IOException e) {
+                printLine(e.getMessage());
+            } finally {
+                printLine(String.format(
+                        "Twoja faktura z dnia: %d.%d została zapisana na pulpicie.",
+                        chosenOrder.placementTime().getDayOfMonth(),
+                        chosenOrder.placementTime().getMonthValue()
+                ));
+            }
+        }
     }
 
     private AuthOption getAuthOption() {
