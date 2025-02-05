@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.mateusz113.shop.util.ProductUtil.getTotalProductsPrice;
+
 public class ConsolePrinter {
     public static void printLine(String line) {
         System.out.println(line);
@@ -38,11 +40,14 @@ public class ConsolePrinter {
     public static void printPreviousOrders(List<Order> orders) {
         printLine("Twoje poprzednie zamówienia:");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        int i = 1;
         for (Order order : orders) {
             String formattedDate = order.placementTime().format(formatter);
-            printLine("Data: " + formattedDate);
+            printLine(String.format("%d) Data: %s", i, formattedDate));
             printProducts(order.products());
+            i++;
         }
+        printLine("Wybierz numer zamównienia z którego chcesz wystawić fakturę, lub wpisz 0 by wrócić do głównego menu.");
     }
 
     public static <T> void printMenuOptions(T[] options) {
@@ -54,11 +59,7 @@ public class ConsolePrinter {
     public static void printCart(Cart cart) {
         printLine("Wózek:\n");
         printProducts(cart.getProducts());
-        BigDecimal sumOfPrices = cart
-                .getProducts()
-                .stream()
-                .map(product -> BigDecimal.valueOf(product.getPrice().doubleValue() * product.getQuantity()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal sumOfPrices = getTotalProductsPrice(cart.getProducts());
         printLine(String.format("Całkowita wartość twojego koszyka wynosi: %.2f zł", sumOfPrices));
     }
 }
