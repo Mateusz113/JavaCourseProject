@@ -1,6 +1,8 @@
 package com.mateusz113.shop.auth;
 
-public record LoginDetails(String email, String password) {
+import java.io.Serializable;
+
+public record LoginDetails(String email, String password) implements Serializable {
     public static class LoginDetailsBuilder {
         private String email;
         private String password;

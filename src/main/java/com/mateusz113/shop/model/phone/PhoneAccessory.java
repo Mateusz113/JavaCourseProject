@@ -1,8 +1,9 @@
 package com.mateusz113.shop.model.phone;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public enum PhoneAccessory {
+public enum PhoneAccessory implements Serializable {
     CASE("Etui", new BigDecimal(10)),
     BRAIDED_CABLE("Pleciony kabel", new BigDecimal(15));
 
