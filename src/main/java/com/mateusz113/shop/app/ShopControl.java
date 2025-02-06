@@ -8,8 +8,6 @@ import com.mateusz113.shop.exception.NoSuchOptionException;
 import com.mateusz113.shop.exception.NoSuchUserException;
 import com.mateusz113.shop.exception.UserAlreadyExistsException;
 import com.mateusz113.shop.io.console.ConsoleReader;
-import com.mateusz113.shop.io.file.order.OrderFileReader;
-import com.mateusz113.shop.io.file.order.OrderFileWriter;
 import com.mateusz113.shop.manager.CartManager;
 import com.mateusz113.shop.model.Order;
 import com.mateusz113.shop.model.Product;
@@ -24,16 +22,12 @@ import static com.mateusz113.shop.io.console.ConsolePrinter.*;
 public class ShopControl {
     private final ManagersDataHandler managersDataHandler;
     private final ConsoleReader consoleReader;
-    private final OrderFileReader orderFileReader;
-    private final OrderFileWriter orderFileWriter;
     private final CartManager cartManager;
     private User currentUser;
 
     public ShopControl() {
         managersDataHandler = new ManagersDataHandler();
         consoleReader = new ConsoleReader();
-        orderFileReader = new OrderFileReader();
-        orderFileWriter = new OrderFileWriter();
         cartManager = new CartManager();
     }
 
@@ -79,7 +73,6 @@ public class ShopControl {
 
     private void mainLoop() {
         printLine(String.format("Witaj %s!", currentUser.firstName()));
-        configureOrderHandlers();
         MainOption option;
         do {
             printMenuOptions(MainOption.values());
@@ -92,12 +85,6 @@ public class ShopControl {
                 case PREVIOUS_ORDERS -> previousOrders();
             }
         } while (option != MainOption.EXIT);
-    }
-
-    private void configureOrderHandlers() {
-        String userOrdersPath = String.format("src/main/resources/data/%s", currentUser.id());
-        orderFileReader.setOrderDetailsFolder(userOrdersPath);
-        orderFileWriter.setOrderDetailsFolder(userOrdersPath);
     }
 
     private void exit() {
@@ -189,7 +176,7 @@ public class ShopControl {
         if (input != 0) {
             Order chosenOrder = orders.get(input - 1);
             try {
-                orderFileWriter.createInvoice(chosenOrder, currentUser);
+                managersDataHandler.getOrderManager().outputInvoice(chosenOrder, currentUser);
             } catch (IOException e) {
                 printLine(e.getMessage());
             } finally {
