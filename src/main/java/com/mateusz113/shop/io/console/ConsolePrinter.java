@@ -1,6 +1,6 @@
-package com.mateusz113.shop.io;
+package com.mateusz113.shop.io.console;
 
-import com.mateusz113.shop.model.Cart;
+import com.mateusz113.shop.manager.CartManager;
 import com.mateusz113.shop.model.Order;
 import com.mateusz113.shop.model.Product;
 
@@ -56,10 +56,10 @@ public class ConsolePrinter {
         }
     }
 
-    public static void printCart(Cart cart) {
+    public static void printCart(CartManager cartManager) {
         printLine("Wózek:\n");
-        printProducts(cart.getProducts());
-        BigDecimal sumOfPrices = getTotalProductsPrice(cart.getProducts());
+        printProducts(cartManager.getProducts());
+        BigDecimal sumOfPrices = getTotalProductsPrice(cartManager.getProducts());
         printLine(String.format("Całkowita wartość twojego koszyka wynosi: %.2f zł", sumOfPrices));
     }
 }

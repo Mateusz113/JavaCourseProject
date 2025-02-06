@@ -1,8 +1,9 @@
 package com.mateusz113.shop.model.laptop;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public enum LaptopAccessory {
+public enum LaptopAccessory implements Serializable {
     LAPTOP_BAG("Torba na laptopa", new BigDecimal(50)),
     WIRELESS_MOUSE("Bezprzewodowa myszka", new BigDecimal(40));
 

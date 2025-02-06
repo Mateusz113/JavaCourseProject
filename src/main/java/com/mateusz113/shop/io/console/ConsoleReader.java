@@ -1,4 +1,4 @@
-package com.mateusz113.shop.io;
+package com.mateusz113.shop.io.console;
 
 import com.mateusz113.shop.auth.LoginDetails;
 import com.mateusz113.shop.auth.LoginDetails.LoginDetailsBuilder;
@@ -18,7 +18,7 @@ import java.util.Scanner;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static com.mateusz113.shop.io.ConsolePrinter.printLine;
+import static com.mateusz113.shop.io.console.ConsolePrinter.printLine;
 
 public class ConsoleReader {
     private final Scanner sc;

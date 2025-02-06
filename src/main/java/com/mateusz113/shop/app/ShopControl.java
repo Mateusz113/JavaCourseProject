@@ -2,101 +2,51 @@ package com.mateusz113.shop.app;
 
 import com.mateusz113.shop.app.menu_navigation.AuthOption;
 import com.mateusz113.shop.app.menu_navigation.MainOption;
-import com.mateusz113.shop.auth.AuthManager;
 import com.mateusz113.shop.auth.LoginDetails;
 import com.mateusz113.shop.auth.RegisterDetails;
-import com.mateusz113.shop.converter.ProductConverter;
-import com.mateusz113.shop.exception.IllegalFormatException;
 import com.mateusz113.shop.exception.NoSuchOptionException;
 import com.mateusz113.shop.exception.NoSuchUserException;
 import com.mateusz113.shop.exception.UserAlreadyExistsException;
-import com.mateusz113.shop.io.ConsoleReader;
+import com.mateusz113.shop.io.console.ConsoleReader;
 import com.mateusz113.shop.io.file.order.OrderFileReader;
 import com.mateusz113.shop.io.file.order.OrderFileWriter;
-import com.mateusz113.shop.io.file.product.ProductFileReader;
-import com.mateusz113.shop.io.file.product.ProductFileWriter;
-import com.mateusz113.shop.io.file.user.UserFileReader;
-import com.mateusz113.shop.io.file.user.UserFileWriter;
-import com.mateusz113.shop.manager.OrderManager;
-import com.mateusz113.shop.model.Cart;
+import com.mateusz113.shop.manager.CartManager;
 import com.mateusz113.shop.model.Order;
 import com.mateusz113.shop.model.Product;
 import com.mateusz113.shop.model.User;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.mateusz113.shop.io.ConsolePrinter.*;
+import static com.mateusz113.shop.io.console.ConsolePrinter.*;
 
 public class ShopControl {
-    private final String USER_LOGIN_INFO_FILE_PATH = "src/main/resources/data/userLoginInfo.txt";
-    private final String USER_DETAILS_FILE_PATH = "src/main/resources/data/userData.txt";
-    private final String PRODUCT_DETAILS_FILE_PATH = "src/main/resources/data/productData.txt";
-    private final AuthManager authManager;
-    private final OrderManager orderManager;
-    private final ProductConverter productConverter;
+    private final ManagersDataHandler managersDataHandler;
     private final ConsoleReader consoleReader;
-    private final UserFileReader userFileReader;
-    private final UserFileWriter userFileWriter;
-    private final ProductFileReader productFileReader;
-    private final ProductFileWriter productFileWriter;
     private final OrderFileReader orderFileReader;
     private final OrderFileWriter orderFileWriter;
-    private final Cart cart;
+    private final CartManager cartManager;
     private User currentUser;
-    private List<Product> shopProducts;
 
     public ShopControl() {
-        this.authManager = new AuthManager();
-        this.orderManager = new OrderManager();
-        this.productConverter = new ProductConverter();
-        this.consoleReader = new ConsoleReader();
-        this.userFileReader = new UserFileReader(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH);
-        this.userFileWriter = new UserFileWriter(USER_LOGIN_INFO_FILE_PATH, USER_DETAILS_FILE_PATH);
-        this.productFileReader = new ProductFileReader(PRODUCT_DETAILS_FILE_PATH);
-        this.productFileWriter = new ProductFileWriter(PRODUCT_DETAILS_FILE_PATH);
-        this.orderFileReader = new OrderFileReader();
-        this.orderFileWriter = new OrderFileWriter();
-        cart = new Cart();
-        shopProducts = new ArrayList<>();
+        managersDataHandler = new ManagersDataHandler();
+        consoleReader = new ConsoleReader();
+        orderFileReader = new OrderFileReader();
+        orderFileWriter = new OrderFileWriter();
+        cartManager = new CartManager();
     }
 
     public void start() {
+        managersDataHandler.loadManagers();
         printGreeting();
-        checkForUserFiles();
-        loadProducts();
-        authLoop();
-    }
-
-    private void loadProducts() {
-        CompletableFuture.runAsync(() -> {
-            try {
-                shopProducts = productConverter.constructProductListFromDetails(productFileReader.getProductsFromFile());
-                Collections.shuffle(shopProducts);
-            } catch (IOException | IllegalFormatException e) {
-                printLine("Aplikacja napotkała problem: " + e.getMessage());
-            }
-        });
-    }
-
-    private void checkForUserFiles() {
-        try {
-            if (!Files.exists(Paths.get(userFileReader.getUserLoginInfoPath()))) {
-                userFileWriter.createLoginInfoFile();
-            }
-            if (!Files.exists(Paths.get(userFileReader.getUserDetailsPath()))) {
-                userFileWriter.createUserDetailsFile();
-            }
-        } catch (IOException e) {
-            printLine("Aplikacja napotkała błąd: " + e.getMessage());
+        while (currentUser == null) {
+            authLoop();
         }
+        mainLoop();
     }
 
-    public void authLoop() {
+    private void authLoop() {
         AuthOption option;
         printMenuOptions(AuthOption.values());
         option = getAuthOption();
@@ -107,40 +57,29 @@ public class ShopControl {
         }
     }
 
-    public void login() {
+    private void login() {
         LoginDetails details = consoleReader.readLoginDetails();
         try {
-            currentUser = authManager.loginUser(details, userFileReader);
+            currentUser = managersDataHandler.getAuthManager().loginUser(details);
             printLine("Pomyślnie zalogowano.\n");
-            mainLoop();
         } catch (NoSuchUserException e) {
             printLine(e.getMessage());
-            authLoop();
-        } catch (IOException e) {
-            printLine(e.getMessage());
-            exit();
         }
     }
 
-    public void register() {
+    private void register() {
         RegisterDetails details = consoleReader.readRegisterDetails();
         try {
-            currentUser = authManager.registerUser(details, userFileWriter, userFileReader);
+            currentUser = managersDataHandler.getAuthManager().registerUser(details);
             printLine("Pomyślnie zarejestrowano.\n");
-            mainLoop();
         } catch (UserAlreadyExistsException e) {
             printLine(e.getMessage());
-            authLoop();
-        } catch (IOException e) {
-            printLine(e.getMessage());
-            exit();
         }
     }
 
-    public void mainLoop() {
+    private void mainLoop() {
         printLine(String.format("Witaj %s!", currentUser.firstName()));
         configureOrderHandlers();
-        readPreviousOrders();
         MainOption option;
         do {
             printMenuOptions(MainOption.values());
@@ -161,27 +100,13 @@ public class ShopControl {
         orderFileWriter.setOrderDetailsFolder(userOrdersPath);
     }
 
-    private void readPreviousOrders() {
-        CompletableFuture.runAsync(() -> {
-            try {
-                orderManager.readPreviousOrdersFromFiles(currentUser.id(), orderFileReader, productConverter);
-            } catch (IOException | IllegalFormatException e) {
-                printLine(e.getMessage());
-            }
-        });
-    }
-
     private void exit() {
-        try {
-            productFileWriter.saveShopProductData(productConverter.constructDetailsListFromProducts(shopProducts));
-            orderManager.writeNewOrdersToFiles(orderFileWriter, productConverter);
-        } catch (IOException e) {
-            printLine(e.getMessage());
-        }
+        managersDataHandler.saveManagers();
         printLine("Zapraszamy ponownie!");
     }
 
     private void shop() {
+        List<Product> shopProducts = managersDataHandler.getShopManager().getProducts();
         if (shopProducts.isEmpty()) {
             printLine("Brak dostępnych produktów w sklepie.");
             return;
@@ -192,36 +117,21 @@ public class ShopControl {
         if (input == 0) return;
         Product chosenProduct = shopProducts.get(input - 1);
         Product configuredProduct = consoleReader.configureProduct(chosenProduct);
-        cart.addProduct(configuredProduct);
-    }
-
-    private void updateProductQuantity(String id, int newQuantity) {
-        Optional<Product> productToUpdate = shopProducts.stream().filter(product -> product.getId().equals(id)).findFirst();
-        productToUpdate.ifPresentOrElse(
-                product -> {
-                    product.setQuantity(newQuantity);
-                    if (product.getQuantity() == 0) {
-                        shopProducts.remove(product);
-                        printLine("Zaktualizowana ilość produktu wynosiła 0, więc został on usunięty.");
-                    } else {
-                        printLine("Pomyślnie zaktualizowano ilość produktu.");
-                    }
-                },
-                () -> printLine("Nie udało się poprawnie zmienić ilości produktu!")
-        );
+        cartManager.addProduct(configuredProduct);
     }
 
     private void manageProducts() {
         printProductsManagementMenu();
         int input = consoleReader.readIntValue(0, 2);
-        if (input == 0) return;
         switch (input) {
-            case 1 -> shopProducts.add(consoleReader.readProductFromKeyboard());
+            case 1 -> managersDataHandler.getShopManager().addProduct(consoleReader.readProductFromKeyboard());
             case 2 -> manageProductQuantities();
         }
+        managersDataHandler.saveShopManager();
     }
 
     private void manageProductQuantities() {
+        List<Product> shopProducts = managersDataHandler.getShopManager().getProducts();
         if (shopProducts.isEmpty()) {
             printLine("Brak dostępnych produktów w sklepie.");
             return;
@@ -232,15 +142,15 @@ public class ShopControl {
         Product chosenProduct = shopProducts.get(input - 1);
         printLine(String.format("Wprowadź nową ilość produktu (poprzednio wynosiła %d)", chosenProduct.getQuantity()));
         input = consoleReader.readIntValue(0, chosenProduct.getQuantity());
-        updateProductQuantity(chosenProduct.getId(), input);
+        managersDataHandler.getShopManager().updateProductQuantity(chosenProduct.getId(), input);
     }
 
     private void cart() {
-        if (cart.getProducts().isEmpty()) {
+        if (cartManager.getProducts().isEmpty()) {
             printLine("Twój koszyk jest pusty!");
             return;
         }
-        printCart(cart);
+        printCart(cartManager);
         printLine("""
                 Co chcesz zrobić?
                 0. Wróć do głównego menu.
@@ -252,52 +162,28 @@ public class ShopControl {
     }
 
     private void placeOrder() {
-        if (checkForProductsAvailability(cart.getProducts())) {
+        //Reload shop data before checking for availability to make sure it is up-to-date
+        managersDataHandler.reloadShopManager();
+        if (!cartManager.areCartProductsAvailable(managersDataHandler.getShopManager().getProducts())) {
+            cartManager.updateCartProductsQuantities(managersDataHandler.getShopManager().getProducts());
             printLine("Produkty w koszyku posiadały wartości niemożliwe do kupienia! Twój koszyk został zaktualizowany.");
             return;
         }
-        List<Product> orderedProducts = new ArrayList<>(cart.getProducts());
-        orderManager.addNewOrder(currentUser.id(), orderedProducts);
-        updateShopProductsQuantity(cart.getProducts());
-        cart.clearProducts();
+        List<Product> orderedProducts = new ArrayList<>(cartManager.getProducts());
+        managersDataHandler.getOrderManager().addNewOrder(currentUser.id(), orderedProducts);
+        managersDataHandler.getShopManager().updateSoldProductsQuantity(cartManager.getProducts());
+        cartManager.clearProducts();
+        //Save data immediately after checkout to make sure other users will use the updated version
+        managersDataHandler.saveShopManager();
         printLine("Dziękujemy za złożenie zamówienia!");
     }
 
-    private void updateShopProductsQuantity(List<Product> products) {
-        for (Product product : products) {
-            shopProducts
-                    .stream()
-                    .filter(p -> p.getId().equals(product.getId()))
-                    .findFirst()
-                    .ifPresent(p -> p.setQuantity(p.getQuantity() - product.getQuantity()));
-        }
-        shopProducts = shopProducts.stream().filter(product -> product.getQuantity() > 0).toList();
-    }
-
-    private boolean checkForProductsAvailability(List<Product> products) {
-        AtomicBoolean productsWereIllegal = new AtomicBoolean(false);
-        Iterator<Product> iterator = products.iterator();
-        while (iterator.hasNext()) {
-            Product product = iterator.next();
-            Optional<Product> shopProduct = shopProducts.stream().filter(p -> p.getId().equals(product.getId())).findFirst();
-            shopProduct.ifPresentOrElse(
-                    p -> {
-                        if (product.getQuantity() > p.getQuantity()) {
-                            product.setQuantity(p.getQuantity());
-                            productsWereIllegal.set(true);
-                        }
-                    },
-                    () -> {
-                        iterator.remove();
-                        productsWereIllegal.set(true);
-                    }
-            );
-        }
-        return productsWereIllegal.get();
-    }
-
     private void previousOrders() {
-        List<Order> orders = orderManager.getAllOrders();
+        List<Order> orders = managersDataHandler.getOrderManager().getUserOrders(currentUser.id());
+        if (orders.isEmpty()) {
+            printLine("Nie masz poprzednich zamówień!");
+            return;
+        }
         printPreviousOrders(orders);
         int input = consoleReader.readIntValue(0, orders.size());
         if (input != 0) {
