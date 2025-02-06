@@ -1,6 +1,5 @@
 package com.mateusz113.shop.io.file.order;
 
-import com.mateusz113.shop.io.file.FileWriterInterface;
 import com.mateusz113.shop.model.Order;
 import com.mateusz113.shop.model.Product;
 import com.mateusz113.shop.model.User;
@@ -10,24 +9,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.mateusz113.shop.util.ProductUtil.getTotalProductsPrice;
 
-public class OrderFileWriter extends OrderFileHandler implements FileWriterInterface {
+public class OrderFileWriter extends OrderFileHandler {
     private boolean append;
 
     public OrderFileWriter() {
         append = false;
     }
 
-    @Override
     public void shouldAppend(boolean append) {
         this.append = append;
-    }
-
-    public void writeOrderToFile(List<String> sList, String path) throws IOException {
-        FileWriterInterface.super.writeStringListToFile(sList, path, append);
     }
 
     public void createInvoice(Order order, User user) throws IOException {
