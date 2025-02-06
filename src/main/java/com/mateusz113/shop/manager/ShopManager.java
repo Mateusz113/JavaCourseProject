@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.mateusz113.shop.io.console.ConsolePrinter.printLine;
 
@@ -55,6 +56,6 @@ public class ShopManager implements Serializable {
     }
 
     private void removeSoldOutProducts() {
-        products = products.stream().filter(product -> product.getQuantity() > 0).toList();
+        products = products.stream().filter(product -> product.getQuantity() > 0).collect(Collectors.toList());
     }
 }
