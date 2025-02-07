@@ -10,11 +10,17 @@ import java.util.List;
 
 import static com.mateusz113.shop.util.ProductUtil.getTotalProductsPrice;
 
+/**
+ * Console printing class.
+ */
 public class ConsolePrinter {
     public static void printLine(String line) {
         System.out.println(line);
     }
 
+    /**
+     * Prints greeting to the application.
+     */
     public static void printGreeting() {
         printLine("***** WITAMY W APLIKACJI ELECTRONICS SHOP *****");
     }
@@ -26,6 +32,11 @@ public class ConsolePrinter {
         printLine("2. Zmień ilość produktu");
     }
 
+    /**
+     * Prints products info to the console.
+     *
+     * @param products list of products to be printed.
+     */
     public static void printProducts(List<Product> products) {
         int i = 1;
         for (Product p : products) {
@@ -37,6 +48,11 @@ public class ConsolePrinter {
         }
     }
 
+    /**
+     * Prints orders info to the console.
+     *
+     * @param orders list of orders to be printed.
+     */
     public static void printPreviousOrders(List<Order> orders) {
         printLine("Twoje poprzednie zamówienia:");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -50,12 +66,22 @@ public class ConsolePrinter {
         printLine("Wybierz numer zamównienia z którego chcesz wystawić fakturę, lub wpisz 0 by wrócić do głównego menu.");
     }
 
+    /**
+     * Prints menu options info to the console.
+     *
+     * @param options list of options to be printed.
+     */
     public static <T> void printMenuOptions(T[] options) {
         for (T option : options) {
             printLine(option.toString());
         }
     }
 
+    /**
+     * Prints cart info to the console.
+     *
+     * @param cartManager cart manager of the application.
+     */
     public static void printCart(CartManager cartManager) {
         printLine("Wózek:\n");
         printProducts(cartManager.getProducts());
