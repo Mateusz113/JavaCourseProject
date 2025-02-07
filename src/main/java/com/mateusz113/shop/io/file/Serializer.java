@@ -8,7 +8,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+/**
+ * Class that holds static methods to serialize and deserialize objects.
+ */
 public class Serializer {
+    /**
+     * Creates a folder resources/data that is the default app spot to hold serialize data.
+     *
+     * @throws IOException if folder could not be created.
+     */
     public static void createSerializeFolder() throws IOException {
         Path serializeFolderPath = Paths
                 .get("src", "main", "resources", "data");
@@ -17,6 +25,13 @@ public class Serializer {
         }
     }
 
+    /**
+     * Imports the {@code Optional} of object data from serialized files.
+     *
+     * @param filePath path to the serialized file.
+     * @return {@code Optional} of the serialized object.
+     * @param <R> serializable class.
+     */
     public static <R extends Serializable> Optional<R> importData(String filePath) {
         try (
                 var ois = new ObjectInputStream(new FileInputStream(filePath))
@@ -32,6 +47,13 @@ public class Serializer {
         return Optional.empty();
     }
 
+    /**
+     * Exports the object into serialized file.
+     *
+     * @param object object to serialize.
+     * @param filePath path to the serialize file of the object.
+     * @param <R> serializable class.
+     */
     public static <R extends Serializable> void exportData(R object, String filePath) {
         try (
                 var oos = new ObjectOutputStream(new FileOutputStream(filePath))
