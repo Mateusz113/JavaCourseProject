@@ -12,6 +12,9 @@ import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+/**
+ * Data handler for app managers.
+ */
 public class ManagersDataHandler {
     private static final String AUTH_MANAGER_SERIALIZE_PATH = Paths
             .get("src", "main", "resources", "data", "AuthManager.ser").toString();
@@ -24,6 +27,9 @@ public class ManagersDataHandler {
     private OrderManager orderManager;
     private ShopManager shopManager;
 
+    /**
+     * Constructor for data handler. Creates an empty folder for managers serialize files, if not present.
+     */
     public ManagersDataHandler() {
         try {
             Serializer.createSerializeFolder();
@@ -44,6 +50,9 @@ public class ManagersDataHandler {
         return shopManager;
     }
 
+    /**
+     * Asynchronously loads managers from specified serialize files.
+     */
     public void loadManagers() {
         CompletableFuture.runAsync(() -> {
             authManager = loadManager(AuthManager::new, AUTH_MANAGER_SERIALIZE_PATH);
@@ -52,10 +61,18 @@ public class ManagersDataHandler {
         });
     }
 
+    /**
+     * Reloads shop manager from serialize file.
+     */
     public void reloadShopManager() {
         shopManager = loadManager(ShopManager::new, SHOP_MANAGER_SERIALIZE_PATH);
     }
 
+
+    /**
+     * Asynchronously saves all the managers to the serialize files.
+     * Makes sure that application does not close before operation is complete.
+     */
     public void saveManagers() {
         CompletableFuture<Void> saveAuthManager = CompletableFuture.runAsync(() -> {
             Serializer.exportData(authManager, AUTH_MANAGER_SERIALIZE_PATH);
@@ -69,13 +86,16 @@ public class ManagersDataHandler {
         CompletableFuture.allOf(saveAuthManager, saveOrderManager, saveShopManager).join();
     }
 
+    /**
+     * Saves shop manager to the serialize file.
+     */
     public void saveShopManager() {
         CompletableFuture.runAsync(() -> {
             Serializer.exportData(shopManager, SHOP_MANAGER_SERIALIZE_PATH);
         }).join();
     }
 
-    public <T extends Serializable> T loadManager(Supplier<T> defaultSupplier, String filePath) {
+    private <T extends Serializable> T loadManager(Supplier<T> defaultSupplier, String filePath) {
         return (T) Serializer.importData(filePath).orElseGet(defaultSupplier);
     }
 }

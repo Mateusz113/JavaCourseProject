@@ -1,11 +1,22 @@
 package com.mateusz113.shop.auth;
 
+/**
+ * Class representing user register details collected from console.
+ *
+ * @param firstName user first name.
+ * @param lastName user last name.
+ * @param email user email.
+ * @param password user password.
+ */
 public record RegisterDetails(
         String firstName,
         String lastName,
         String email,
         String password
 ) {
+    /**
+     * Builder class for {@code RegisterDetails}.
+     */
     public static class RegisterDetailsBuilder {
         private String firstName;
         private String lastName;
@@ -35,6 +46,12 @@ public record RegisterDetails(
             return this;
         }
 
+        /**
+         * Builder build method.
+         *
+         * @return {@code RegisterDetails} instance with builder fields.
+         * @throws IllegalStateException if not all fields were initialized before calling the build.
+         */
         public RegisterDetails build() {
             if (firstName == null || lastName == null || email == null || password == null) {
                 throw new IllegalStateException("Wszystkie zmienne muszą być zainicjowane przed budowaniem!");
@@ -43,6 +60,11 @@ public record RegisterDetails(
         }
     }
 
+    /**
+     * Builder creator method.
+     *
+     * @return builder for the {@code RegisterDetails}.
+     */
     public static RegisterDetailsBuilder builder(){
         return new RegisterDetailsBuilder();
     }

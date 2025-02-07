@@ -11,9 +11,18 @@ import java.util.List;
 
 import static com.mateusz113.shop.util.ProductUtil.getTotalProductsPrice;
 
+/**
+ * Class that holds and manages app order data.
+ */
 public class OrderManager implements Serializable {
     private final List<Order> orders = new ArrayList<>();
 
+    /**
+     * Retrieves orders of the user.
+     *
+     * @param userId ID of the user to retrieve orders of.
+     * @return {@code List<Order>} of the user.
+     */
     public List<Order> getUserOrders(String userId) {
         return orders.stream().filter(order -> order.userId().equals(userId)).toList();
     }
@@ -22,6 +31,13 @@ public class OrderManager implements Serializable {
         orders.add(new Order(userId, LocalDateTime.now(), products));
     }
 
+    /**
+     * Outputs the invoice for the order into the text file on Desktop.
+     *
+     * @param order order for the invoice.
+     * @param user user that placed the order.
+     * @throws IOException if a file cannot be outputted.
+     */
     public void outputInvoice(Order order, User user) throws IOException {
         String desktopPath = System.getProperty("user.home") + File.separator + "Desktop";
         LocalDateTime orderPlacementTime = order.placementTime();

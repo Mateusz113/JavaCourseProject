@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Subclass of the {@code Product} that holds additional laptop information.
+ */
 public class Laptop extends Product {
     private final String processor;
     private final String graphicsCard;
@@ -14,6 +17,16 @@ public class Laptop extends Product {
     private int monitorRefreshRate;
     private List<LaptopAccessory> accessories;
 
+    /**
+     * Constructor of the {@code Laptop} class.
+     *
+     * @param id ID of the laptop.
+     * @param name name of the laptop.
+     * @param price price of the laptop.
+     * @param quantity quantity of the laptop.
+     * @param processor processor that is inside the laptop.
+     * @param graphicsCard graphics card that is inside the laptop.
+     */
     public Laptop(String id, String name, BigDecimal price, int quantity, String processor, String graphicsCard) {
         super(id, name, price, quantity);
         this.processor = processor;

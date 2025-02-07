@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Class that holds and manages app cart data.
+ */
 public class CartManager {
     private List<Product> products;
 
@@ -27,6 +30,12 @@ public class CartManager {
         products.clear();
     }
 
+    /**
+     * Function checks if the products in the cart are still available.
+     *
+     * @param availableProducts products available in the store.
+     * @return true if the products can be bought, and false otherwise.
+     */
     public boolean areCartProductsAvailable(List<Product> availableProducts) {
         AtomicBoolean productsAreLegal = new AtomicBoolean(true);
         for (Product product : products) {
@@ -49,6 +58,13 @@ public class CartManager {
         return productsAreLegal.get();
     }
 
+    /**
+     * Updates the product quantities in the cart.
+     * If the product is no longer available, then it removes it.
+     * If the product desired quantity is higher than available, then set it to available max.
+     *
+     * @param availableProducts products available in the store.
+     */
     public void updateCartProductsQuantities(List<Product> availableProducts) {
         Iterator<Product> iterator = products.iterator();
         while (iterator.hasNext()) {

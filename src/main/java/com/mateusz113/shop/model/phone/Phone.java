@@ -7,11 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Subclass of the {@code Product} class that holds additional phone information.
+ */
 public class Phone extends Product {
     private String phoneColor;
     private int batterySize;
     private List<PhoneAccessory> accessories;
 
+    /**
+     * Constructor of the phone class.
+     *
+     * @param id ID of the phone.
+     * @param name name of the phone.
+     * @param price price of the phone.
+     * @param quantity quantity of the phone.
+     */
     public Phone(String id, String name, BigDecimal price, int quantity) {
         super(id, name, price, quantity);
         this.phoneColor = "Czarny";
