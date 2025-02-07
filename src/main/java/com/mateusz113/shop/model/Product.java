@@ -3,12 +3,23 @@ package com.mateusz113.shop.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+/**
+ * Class that holds the product information.
+ */
 public class Product implements Serializable {
     private final String id;
     private final String name;
     private BigDecimal price;
     private int quantity;
 
+    /**
+     * Constructor of the {@code Product} class.
+     *
+     * @param id ID of the product.
+     * @param name name of the product.
+     * @param price price of the product.
+     * @param quantity quantity of the product.
+     */
     public Product(String id, String name, BigDecimal price, int quantity) {
         this.id = id;
         this.name = name;
