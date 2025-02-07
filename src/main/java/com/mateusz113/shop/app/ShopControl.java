@@ -19,18 +19,27 @@ import java.util.List;
 
 import static com.mateusz113.shop.io.console.ConsolePrinter.*;
 
+/**
+ * Class that manages the control of the Shop app.
+ */
 public class ShopControl {
     private final ManagersDataHandler managersDataHandler;
     private final ConsoleReader consoleReader;
     private final CartManager cartManager;
     private User currentUser;
 
+    /**
+     * Constructor of the shop control class.
+     */
     public ShopControl() {
         managersDataHandler = new ManagersDataHandler();
         consoleReader = new ConsoleReader();
         cartManager = new CartManager();
     }
 
+    /**
+     * Starts the app loop.
+     */
     public void start() {
         managersDataHandler.loadManagers();
         printGreeting();
@@ -40,6 +49,9 @@ public class ShopControl {
         mainLoop();
     }
 
+    /**
+     * Auth loop of the app.
+     */
     private void authLoop() {
         AuthOption option;
         printMenuOptions(AuthOption.values());
@@ -51,6 +63,9 @@ public class ShopControl {
         }
     }
 
+    /**
+     * Logins the user into the system.
+     */
     private void login() {
         LoginDetails details = consoleReader.readLoginDetails();
         try {
@@ -61,6 +76,9 @@ public class ShopControl {
         }
     }
 
+    /**
+     * Registers the user into the system.
+     */
     private void register() {
         RegisterDetails details = consoleReader.readRegisterDetails();
         try {
@@ -71,6 +89,9 @@ public class ShopControl {
         }
     }
 
+    /**
+     * Main loop of the app.
+     */
     private void mainLoop() {
         printLine(String.format("Witaj %s!", currentUser.firstName()));
         MainOption option;
@@ -87,11 +108,17 @@ public class ShopControl {
         } while (option != MainOption.EXIT);
     }
 
+    /**
+     * Exit function of the application.
+     */
     private void exit() {
         managersDataHandler.saveManagers();
         printLine("Zapraszamy ponownie!");
     }
 
+    /**
+     * App shop functionality.
+     */
     private void shop() {
         List<Product> shopProducts = managersDataHandler.getShopManager().getProducts();
         if (shopProducts.isEmpty()) {
@@ -107,6 +134,9 @@ public class ShopControl {
         cartManager.addProduct(configuredProduct);
     }
 
+    /**
+     * App managing product functionality.
+     */
     private void manageProducts() {
         printProductsManagementMenu();
         int input = consoleReader.readIntValue(0, 2);
@@ -117,6 +147,9 @@ public class ShopControl {
         managersDataHandler.saveShopManager();
     }
 
+    /**
+     * App product quantities management.
+     */
     private void manageProductQuantities() {
         List<Product> shopProducts = managersDataHandler.getShopManager().getProducts();
         if (shopProducts.isEmpty()) {
@@ -132,6 +165,9 @@ public class ShopControl {
         managersDataHandler.getShopManager().updateProductQuantity(chosenProduct.getId(), input);
     }
 
+    /**
+     * App cart functionality.
+     */
     private void cart() {
         if (cartManager.getProducts().isEmpty()) {
             printLine("Twój koszyk jest pusty!");
@@ -148,6 +184,9 @@ public class ShopControl {
         placeOrder();
     }
 
+    /**
+     * App order placing functionality.
+     */
     private void placeOrder() {
         //Reload shop data before checking for availability to make sure it is up-to-date
         managersDataHandler.reloadShopManager();
@@ -165,6 +204,9 @@ public class ShopControl {
         printLine("Dziękujemy za złożenie zamówienia!");
     }
 
+    /**
+     * App previous orders functionality.
+     */
     private void previousOrders() {
         List<Order> orders = managersDataHandler.getOrderManager().getUserOrders(currentUser.id());
         if (orders.isEmpty()) {
@@ -189,6 +231,11 @@ public class ShopControl {
         }
     }
 
+    /**
+     * Retrieves {@code AuthOption} from user input.
+     *
+     * @return {@code AuthOption} user chose.
+     */
     private AuthOption getAuthOption() {
         boolean optionIsValid = false;
         AuthOption option = null;
@@ -204,6 +251,11 @@ public class ShopControl {
         return option;
     }
 
+    /**
+     * Retrieves {@code MainOption} from user input.
+     *
+     * @return {@code MainOption} user chose.
+     */
     private MainOption getMainOption() {
         boolean optionIsValid = false;
         MainOption option = null;
