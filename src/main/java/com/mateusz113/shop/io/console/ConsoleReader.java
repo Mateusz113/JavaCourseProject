@@ -20,14 +20,25 @@ import java.util.function.Consumer;
 
 import static com.mateusz113.shop.io.console.ConsolePrinter.printLine;
 
+/**
+ * Console reading class.
+ */
 public class ConsoleReader {
     private final Scanner sc;
 
+    /**
+     * Constructor for ConsoleReader
+     */
     public ConsoleReader() {
         sc = new Scanner(System.in);
         sc.useLocale(Locale.US);
     }
 
+    /**
+     * Reads register details from console.
+     *
+     * @return {@code RegisterDetails} object with user provided data.
+     */
     public RegisterDetails readRegisterDetails() {
         RegisterDetailsBuilder builder = RegisterDetails.builder();
         printLine("Wprowadź imię:");
@@ -41,6 +52,11 @@ public class ConsoleReader {
         return builder.build();
     }
 
+    /**
+     * Reads login details from console.
+     *
+     * @return {@code LoginDetails} object with user provided data.
+     */
     public LoginDetails readLoginDetails() {
         LoginDetailsBuilder builder = LoginDetails.builder();
         printLine("Wprowadź email:");
@@ -50,6 +66,12 @@ public class ConsoleReader {
         return builder.build();
     }
 
+    /**
+     * Constructs a new product based on the chosen product details with additional customise options.
+     *
+     * @param chosenProduct selected product for configuration.
+     * @return new {@code Product} instance after configuration.
+     */
     public Product configureProduct(Product chosenProduct) {
         Product configuredProduct = null;
         if (chosenProduct instanceof Phone) {
@@ -85,6 +107,11 @@ public class ConsoleReader {
         return configuredProduct;
     }
 
+    /**
+     * Configures phone details.
+     *
+     * @param phone phone to be configured.
+     */
     private void configurePhone(Phone phone) {
         printLine("Jaki chcesz kolor telefonu?");
         printLine("""
@@ -148,6 +175,11 @@ public class ConsoleReader {
         }
     }
 
+    /**
+     * Configures laptop details.
+     *
+     * @param laptop laptop to be configured.
+     */
     private void configureLaptop(Laptop laptop) {
         printLine("Ile chcesz pamięci ram?");
         printLine("""
@@ -212,6 +244,11 @@ public class ConsoleReader {
         }
     }
 
+    /**
+     * Reads new product data from keyboard.
+     *
+     * @return {@code Product} with user provided data.
+     */
     public Product readProductFromKeyboard() {
         printLine("""
                 Co chcesz dodać?
@@ -234,6 +271,14 @@ public class ConsoleReader {
         return product;
     }
 
+    /**
+     * Reads additional information for laptop creation.
+     *
+     * @param name     name of the laptop.
+     * @param price    price of the laptop.
+     * @param quantity quantity of the laptop.
+     * @return {@code Laptop} with the parameters and additional user provided data.
+     */
     private Laptop readLaptopFromKeyboard(String name, BigDecimal price, int quantity) {
         printLine("Podaj nazwę procesora:");
         String processor = sc.nextLine();
@@ -242,6 +287,11 @@ public class ConsoleReader {
         return new Laptop(UUID.randomUUID().toString(), name, price, quantity, processor, graphicsCard);
     }
 
+    /**
+     * Reads int value from console.
+     *
+     * @return read int value.
+     */
     public int readIntValue() {
         int value = -1;
         boolean isInputValid = false;
@@ -258,7 +308,13 @@ public class ConsoleReader {
         return value;
     }
 
-    //Function includes from and to values when boundary checking
+    /**
+     * Reads int value from console with boundaries.
+     *
+     * @param from start of the boundary. (including)
+     * @param to   end of the boundary. (including)
+     * @return int value within the boundaries.
+     */
     public int readIntValue(int from, int to) {
         int input = Integer.MIN_VALUE;
         boolean inputIsValid = false;
@@ -279,6 +335,11 @@ public class ConsoleReader {
         return input;
     }
 
+    /**
+     * Reads {@code BigDecimal} value from console.
+     *
+     * @return read {@code BigDecimal} value.
+     */
     public BigDecimal readBigDecimalValue() {
         BigDecimal input = null;
         boolean inputIsValid = false;
@@ -295,6 +356,12 @@ public class ConsoleReader {
         return input;
     }
 
+    /**
+     * Reads {@code String} value from console that complies with validation.
+     *
+     * @param validator function that checks if the value read is valid.
+     * @return {@code String} value read from console that passed validation.
+     */
     private String readStringValueWithValidator(Consumer<String> validator) {
         String value = "";
         boolean isInputValid = false;
