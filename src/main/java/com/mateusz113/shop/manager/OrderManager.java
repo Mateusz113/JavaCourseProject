@@ -27,8 +27,8 @@ public class OrderManager implements Serializable {
         return orders.stream().filter(order -> order.userId().equals(userId)).toList();
     }
 
-    public void addNewOrder(String userId, List<Product> products) {
-        orders.add(new Order(userId, LocalDateTime.now(), products));
+    public void addNewOrder(Order order) {
+        orders.add(order);
     }
 
     /**
