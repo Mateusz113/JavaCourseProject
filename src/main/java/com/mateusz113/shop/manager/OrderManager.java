@@ -6,6 +6,7 @@ import com.mateusz113.shop.model.User;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,17 +49,22 @@ public class OrderManager implements Serializable {
                 orderPlacementTime.getMinute()
         );
         String filePath = desktopPath + File.separator + fileName;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         try (
                 BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))
         ) {
             writer.write("****** FAKTURA ZE SKLEPU \"ELECTRONICS SHOP\" ******\n");
+            writer.write(String.format("Data zakupu: %s%n", formatter.format(order.placementTime())));
             writer.write("Wystawiający: Electronics Shop\n");
             writer.write(String.format("Kupujący: %s %s%n", user.firstName(), user.lastName()));
             writer.write(String.format("Email kupującego: %s%n", user.email()));
-            writer.write("Zamówione produkty:\n");
+            writer.write("Zamówione produkty:\n\n");
+            int i = 1;
             for (Product p : order.products()) {
+                writer.write(String.format("%d) ", i));
                 writer.write(p.toString());
                 writer.newLine();
+                i++;
             }
             writer.write(String.format("Całkowita kwota zamówienia wyniosła: %.2f zł%n", getTotalProductsPrice(order.products())));
             writer.write("Podpisano: Electronics Shop");
