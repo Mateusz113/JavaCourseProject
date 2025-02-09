@@ -14,6 +14,7 @@ import com.mateusz113.shop.model.Product;
 import com.mateusz113.shop.model.User;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,9 +71,9 @@ public class ShopControl {
         LoginDetails details = consoleReader.readLoginDetails();
         try {
             currentUser = managersDataHandler.getAuthManager().loginUser(details);
-            printLine("Pomyślnie zalogowano.\n");
+            printLoginConfirmation();
         } catch (NoSuchUserException e) {
-            printLine(e.getMessage());
+            printError(e.getMessage());
         }
     }
 
@@ -83,9 +84,9 @@ public class ShopControl {
         RegisterDetails details = consoleReader.readRegisterDetails();
         try {
             currentUser = managersDataHandler.getAuthManager().registerUser(details);
-            printLine("Pomyślnie zarejestrowano.\n");
+            printRegisterConfirmation();
         } catch (UserAlreadyExistsException e) {
-            printLine(e.getMessage());
+            printError(e.getMessage());
         }
     }
 
@@ -93,7 +94,7 @@ public class ShopControl {
      * Main loop of the app.
      */
     private void mainLoop() {
-        printLine(String.format("Witaj %s!", currentUser.firstName()));
+        printUserGreeting(currentUser.firstName());
         MainOption option;
         do {
             printMenuOptions(MainOption.values());
@@ -113,7 +114,7 @@ public class ShopControl {
      */
     private void exit() {
         managersDataHandler.saveManagers();
-        printLine("Zapraszamy ponownie!");
+        printGoodbye();
     }
 
     /**
@@ -121,13 +122,10 @@ public class ShopControl {
      */
     private void shop() {
         List<Product> shopProducts = managersDataHandler.getShopManager().getProducts();
-        if (shopProducts.isEmpty()) {
-            printLine("Brak dostępnych produktów w sklepie.");
-            return;
-        }
-        printProducts(shopProducts);
-        printLine("Podaj numer produktu który chcesz kupić, lub wpisz 0 by cofnąć do głównego menu.");
+        printShop(shopProducts);
+        if (shopProducts.isEmpty()) return;
         int input = consoleReader.readIntValue(0, shopProducts.size());
+        //0 option is return to the main menu.
         if (input == 0) return;
         Product chosenProduct = shopProducts.get(input - 1);
         Product configuredProduct = consoleReader.configureProduct(chosenProduct);
@@ -152,15 +150,13 @@ public class ShopControl {
      */
     private void manageProductQuantities() {
         List<Product> shopProducts = managersDataHandler.getShopManager().getProducts();
-        if (shopProducts.isEmpty()) {
-            printLine("Brak dostępnych produktów w sklepie.");
-            return;
-        }
-        printProducts(shopProducts);
-        printLine("Podaj numer produktu którego ilość chcesz zmienić:");
+        printQuantitiesManagement(shopProducts);
+        if (shopProducts.isEmpty()) return;
+        //Reads the product number to change quantity.
         int input = consoleReader.readIntValue(1, shopProducts.size());
         Product chosenProduct = shopProducts.get(input - 1);
-        printLine(String.format("Wprowadź nową ilość produktu (poprzednio wynosiła %d)", chosenProduct.getQuantity()));
+        printProductQuantityInfo(chosenProduct);
+        //Read new quantity value.
         input = consoleReader.readIntValue(0, chosenProduct.getQuantity());
         managersDataHandler.getShopManager().updateProductQuantity(chosenProduct.getId(), input);
     }
@@ -169,16 +165,9 @@ public class ShopControl {
      * App cart functionality.
      */
     private void cart() {
-        if (cartManager.getProducts().isEmpty()) {
-            printLine("Twój koszyk jest pusty!");
-            return;
-        }
         printCart(cartManager);
-        printLine("""
-                Co chcesz zrobić?
-                0. Wróć do głównego menu.
-                1. Opłać zamówienie.
-                """);
+        if (cartManager.getProducts().isEmpty()) return;
+        //0 option is return to the main menu.
         int input = consoleReader.readIntValue(0, 1);
         if (input == 0) return;
         placeOrder();
@@ -188,20 +177,20 @@ public class ShopControl {
      * App order placing functionality.
      */
     private void placeOrder() {
-        //Reload shop data before checking for availability to make sure it is up-to-date
+        //Reload shop data before checking for availability to make sure it is up to date
         managersDataHandler.reloadShopManager();
         if (!cartManager.areCartProductsAvailable(managersDataHandler.getShopManager().getProducts())) {
             cartManager.updateCartProductsQuantities(managersDataHandler.getShopManager().getProducts());
-            printLine("Produkty w koszyku posiadały wartości niemożliwe do kupienia! Twój koszyk został zaktualizowany.");
+            printImpossibleCartInfo();
             return;
         }
-        List<Product> orderedProducts = new ArrayList<>(cartManager.getProducts());
-        managersDataHandler.getOrderManager().addNewOrder(currentUser.id(), orderedProducts);
+        Order newOrder = new Order(currentUser.id(), LocalDateTime.now(), new ArrayList<>(cartManager.getProducts()));
+        managersDataHandler.getOrderManager().addNewOrder(newOrder);
         managersDataHandler.getShopManager().updateSoldProductsQuantity(cartManager.getProducts());
+        printPlacedOrderInfoAndGratitude(newOrder);
         cartManager.clearProducts();
         //Save data immediately after checkout to make sure other users will use the updated version
         managersDataHandler.saveShopManager();
-        printLine("Dziękujemy za złożenie zamówienia!");
     }
 
     /**
@@ -209,11 +198,8 @@ public class ShopControl {
      */
     private void previousOrders() {
         List<Order> orders = managersDataHandler.getOrderManager().getUserOrders(currentUser.id());
-        if (orders.isEmpty()) {
-            printLine("Nie masz poprzednich zamówień!");
-            return;
-        }
         printPreviousOrders(orders);
+        if (orders.isEmpty()) return;
         int input = consoleReader.readIntValue(0, orders.size());
         if (input != 0) {
             Order chosenOrder = orders.get(input - 1);
@@ -222,11 +208,7 @@ public class ShopControl {
             } catch (IOException e) {
                 printLine(e.getMessage());
             } finally {
-                printLine(String.format(
-                        "Twoja faktura z dnia: %d.%d została zapisana na pulpicie.",
-                        chosenOrder.placementTime().getDayOfMonth(),
-                        chosenOrder.placementTime().getMonthValue()
-                ));
+                printInvoiceCreationInfo(chosenOrder);
             }
         }
     }

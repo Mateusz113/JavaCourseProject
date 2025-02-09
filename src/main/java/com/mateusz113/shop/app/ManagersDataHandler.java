@@ -34,7 +34,7 @@ public class ManagersDataHandler {
         try {
             Serializer.createSerializeFolder();
         } catch (IOException e) {
-            ConsolePrinter.printLine("Nie udało się stworzyć folderu do serializacji!");
+            ConsolePrinter.printError("Nie udało się stworzyć folderu do serializacji!");
         }
     }
 

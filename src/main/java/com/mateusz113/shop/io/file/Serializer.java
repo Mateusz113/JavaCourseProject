@@ -38,11 +38,11 @@ public class Serializer {
         ) {
             return Optional.of((R) ois.readObject());
         } catch (FileNotFoundException e) {
-            ConsolePrinter.printLine("Brak pliku lub folderu w ścieżce: " + filePath);
+            ConsolePrinter.printError("Brak pliku lub folderu w ścieżce: " + filePath);
         } catch (IOException e) {
-            ConsolePrinter.printLine("Błąd odczytu pliku ze ścieżki: " + filePath);
+            ConsolePrinter.printError("Błąd odczytu pliku ze ścieżki: " + filePath);
         } catch (ClassNotFoundException e) {
-            ConsolePrinter.printLine("Niezgodny typ danych z pliku ze ścieżki: " + filePath);
+            ConsolePrinter.printError("Niezgodny typ danych z pliku ze ścieżki: " + filePath);
         }
         return Optional.empty();
     }
@@ -60,9 +60,9 @@ public class Serializer {
         ) {
             oos.writeObject(object);
         } catch (FileNotFoundException e) {
-            ConsolePrinter.printLine("Brak pliku lub folderu w ścieżce: " + filePath);
+            ConsolePrinter.printError("Brak pliku lub folderu w ścieżce: " + filePath);
         } catch (IOException e) {
-            ConsolePrinter.printLine("Błąd zapisu do pliku o nazwie: " + filePath);
+            ConsolePrinter.printError("Błąd zapisu do pliku o nazwie: " + filePath);
         }
     }
 }
