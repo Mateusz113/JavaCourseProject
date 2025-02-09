@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.mateusz113.shop.io.console.ConsolePrinter.printError;
 import static com.mateusz113.shop.io.console.ConsolePrinter.printLine;
 
 /**
@@ -72,7 +73,7 @@ public class ShopManager implements Serializable {
                         printLine("Pomyślnie zaktualizowano ilość produktu.");
                     }
                 },
-                () -> printLine("Nie udało się poprawnie zmienić ilości produktu!")
+                () -> printError("Nie udało się poprawnie zmienić ilości produktu!")
         );
     }
 
