@@ -18,6 +18,7 @@ import java.util.Scanner;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static com.mateusz113.shop.io.console.ConsolePrinter.printError;
 import static com.mateusz113.shop.io.console.ConsolePrinter.printLine;
 
 /**
@@ -300,7 +301,7 @@ public class ConsoleReader {
                 value = sc.nextInt();
                 isInputValid = true;
             } catch (InputMismatchException e) {
-                printLine("Wprowadzony tekst nie jest liczbą! Spróbuj ponownie.");
+                printError("Wprowadzony tekst nie jest liczbą! Spróbuj ponownie.");
             } finally {
                 sc.nextLine();
             }
@@ -322,12 +323,12 @@ public class ConsoleReader {
             try {
                 input = sc.nextInt();
                 if (input < from || input > to) {
-                    printLine(String.format("Wprowadzona liczba musi się mieścić w zakrecie od %d do %d!", from, to));
+                    printError(String.format("Wprowadzona liczba musi się mieścić w zakrecie od %d do %d!", from, to));
                 } else {
                     inputIsValid = true;
                 }
             } catch (InputMismatchException e) {
-                printLine("Wprowadzony tekst nie jest liczbą! Spróbuj ponownie.");
+                printError("Wprowadzony tekst nie jest liczbą! Spróbuj ponownie.");
             } finally {
                 sc.nextLine();
             }
@@ -348,7 +349,7 @@ public class ConsoleReader {
                 input = sc.nextBigDecimal();
                 inputIsValid = true;
             } catch (InputMismatchException e) {
-                printLine("Wprowadzony tekst nie jest liczbą, lub użyto nieprawidłowego znaku rozdzielającego części dziesiętne! (Używaj kropki)");
+                printError("Wprowadzony tekst nie jest liczbą, lub użyto nieprawidłowego znaku rozdzielającego części dziesiętne! (Używaj kropki)");
             } finally {
                 sc.nextLine();
             }
@@ -371,7 +372,7 @@ public class ConsoleReader {
                 validator.accept(value);
                 isInputValid = true;
             } catch (IllegalArgumentException e) {
-                printLine(String.format("%s Spróbuj ponownie.", e.getMessage()));
+                printError(String.format("%s Spróbuj ponownie.", e.getMessage()));
             }
         }
         return value;
